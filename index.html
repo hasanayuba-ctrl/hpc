@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT. Hirzan Prima Cipta — Digitalize All Your Works</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --blue: #4A6FA5;
+    --blue-light: #7B9FCA;
+    --blue-dark: #3A5A8A;
+    --blue-pale: #E8EFF8;
+    --yellow: #E2B44A;
+    --yellow-light: #F0CF7A;
+    --yellow-dark: #C49A32;
+    --gold: #E2B44A;
+    --gold-light: #F0CF7A;
+    --gold-dark: #C49A32;
+    --ink: #1E2A3A;
+    --ink-soft: #2C3E50;
+    --paper: #F8FAFB;
+    --warm-white: #FFFFFF;
+    --muted: #6B7D8E;
+    --muted-light: #9BAAB8;
+    --border: #D8E1E8;
+    --surface: #EDF1F5;
+    --surface-warm: #F0F4F8;
+    --accent-blue: #4A6FA5;
+    --success: #16A34A;
+    --danger: #DC2626;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+  /* ========== NAVBAR ========== */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow 0.3s;
+  }
+  .navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .nav-logo-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  .nav-brand-text {
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+  .nav-brand-text small {
+    display: block;
+    font-weight: 400;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .nav-links { display: flex; gap: 4px; align-items: center; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover { background: var(--surface); color: var(--ink); }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark)) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 10px 20px !important;
+  }
+  .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+  }
+  .hamburger span {
+    width: 24px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  /* ========== HERO ========== */
+  .hero {
+    padding: 140px 0 80px;
+    background: linear-gradient(165deg, #1E2A3A 0%, #243B55 40%, #2C4A6E 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -100px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(74,111,165,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    left: -50px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(226,180,74,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(74,111,165,0.2);
+    border: 1px solid rgba(74,111,165,0.35);
+    padding: 6px 16px;
+    border-radius: 24px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--yellow-light);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3.2rem;
+    font-weight: 400;
+    color: white;
+    line-height: 1.15;
+    margin-bottom: 18px;
+  }
+  .hero h1 em {
+    color: var(--yellow-light);
+    font-style: italic;
+  }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.8;
+    margin-bottom: 32px;
+    max-width: 480px;
+  }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    color: white;
+    box-shadow: 0 4px 16px rgba(74,111,165,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(74,111,165,0.4); }
+  .btn-outline {
+    background: transparent;
+    color: white;
+    border: 1.5px solid rgba(255,255,255,0.25);
+  }
+  .btn-outline:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
+
+  .hero-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 36px;
+    backdrop-filter: blur(8px);
+  }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .hero-stat {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .hero-stat .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--yellow-light);
+    display: block;
+  }
+  .hero-stat .lbl {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+  }
+  .hero-card-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+  }
+  .hero-card-footer .check { color: var(--success); font-size: 1.1rem; }
+
+  /* ========== SECTIONS ========== */
+  section { padding: 80px 0; }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.8;
+  }
+  .section-header { text-align: center; margin-bottom: 48px; }
+  .section-header .section-desc { margin: 0 auto; }
+
+  /* ========== ABOUT ========== */
+  #tentang { background: var(--warm-white); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .about-features { display: flex; flex-direction: column; gap: 20px; margin-top: 28px; }
+  .about-feature {
+    display: flex;
+    gap: 16px;
+    padding: 18px;
+    background: var(--surface-warm);
+    border-radius: 12px;
+    border: 1px solid rgba(74,111,165,0.12);
+  }
+  .about-feature-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .about-feature h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 2px; }
+  .about-feature p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  .about-image-block {
+    background: linear-gradient(135deg, #1E2A3A, #243B55);
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .about-image-block::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(226,180,74,0.2), transparent 70%);
+    border-radius: 50%;
+  }
+  .about-big-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 4rem;
+    color: var(--yellow-light);
+    opacity: 0.15;
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    line-height: 1;
+  }
+  .about-image-block h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .about-image-block p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    position: relative;
+  }
+  .about-image-block .addr {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.45);
+    position: relative;
+  }
+
+  /* ========== SERVICES ========== */
+  #layanan { background: var(--paper); }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .service-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--blue), var(--blue-light));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
+  .service-card:hover::before { opacity: 1; }
+  .service-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--surface-warm);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 18px;
+  }
+  .service-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .service-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* ========== PRICING ========== */
+  #harga { background: var(--warm-white); }
+  .pricing-category {
+    margin-bottom: 48px;
+  }
+  .pricing-category:last-child { margin-bottom: 0; }
+  .pricing-cat-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pricing-cat-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .pricing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .pricing-grid.quad { grid-template-columns: repeat(4, 1fr); }
+
+  .price-card {
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .price-card:hover { border-color: var(--blue); box-shadow: 0 8px 24px rgba(74,111,165,0.08); }
+  .price-card.featured {
+    border-color: var(--blue);
+    background: linear-gradient(170deg, #EEF3FA, #F5F8FC);
+  }
+  .price-card.featured::before {
+    content: 'POPULER';
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--blue);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.06em;
+  }
+  .price-card .pkg-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--blue-dark);
+    margin-bottom: 4px;
+  }
+  .price-card h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .price-card .price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .price-card .price small { font-size: 0.9rem; font-weight: 400; }
+  .price-card .price-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .price-card ul {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+  .price-card ul li {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    padding: 5px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .price-card ul li::before {
+    content: '✓';
+    color: var(--success);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .price-card .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    color: white;
+  }
+  .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-soft {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .btn-soft:hover { background: var(--border); }
+
+  /* ========== FLOW ========== */
+  #alur { background: var(--paper); }
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .flow-steps::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue-light), var(--blue), var(--blue-light));
+    opacity: 0.3;
+  }
+  .flow-step {
+    text-align: center;
+    position: relative;
+  }
+  .flow-num {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    color: white;
+    margin: 0 auto 16px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 16px rgba(74,111,165,0.25);
+  }
+  .flow-step h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+  .flow-step p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+  /* ========== SURAT KETERANGAN ========== */
+  #surat { background: linear-gradient(170deg, #1E2A3A, #243B55); color: white; }
+
+  /* ========== ORDER SECTION ========== */
+  #order { background: linear-gradient(170deg, #243B55, #1E2A3A); color: white; }
+  #order .section-label { color: var(--yellow-light); }
+  #order .section-title { color: white; }
+  #order .section-desc { color: rgba(255,255,255,0.55); }
+  #surat .section-label { color: var(--yellow-light); }
+  #surat .section-title { color: white; }
+  #surat .section-desc { color: rgba(255,255,255,0.55); }
+
+  .surat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .surat-form {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 32px;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: rgba(255,255,255,0.7);
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: white;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--blue);
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: rgba(255,255,255,0.25);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group select option { background: var(--ink); color: white; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .btn-generate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-top: 8px;
+  }
+  .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,111,165,0.35); }
+  .btn-generate:active { transform: translateY(0); }
+
+  .surat-info h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+  }
+  .surat-info p {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+  .surat-preview {
+    background: white;
+    border-radius: 12px;
+    padding: 32px 28px;
+    color: var(--ink);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    position: relative;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+  }
+  .surat-preview .sp-header {
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 16px;
+  }
+  .surat-preview .sp-header h4 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .surat-preview .sp-header p {
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0;
+  }
+  .surat-preview .sp-header small {
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+  .surat-preview .sp-title {
+    text-align: center;
+    margin: 14px 0;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-decoration: underline;
+  }
+  .surat-preview .sp-body { font-size: 0.68rem; color: #444; }
+  .surat-preview .sp-line { display: flex; gap: 8px; margin: 3px 0; }
+  .surat-preview .sp-line .sp-lbl { min-width: 70px; color: var(--muted); }
+  .surat-preview .sp-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    color: rgba(74,111,165,0.06);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* ========== CONTACT / FOOTER ========== */
+  .footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.6);
+    padding: 60px 0 24px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  .footer h4 {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+  .footer p { font-size: 0.85rem; line-height: 1.8; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 8px; }
+  .footer-links a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--yellow-light); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+  }
+
+  /* ========== WHATSAPP FAB ========== */
+  .wa-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 24px rgba(37,211,102,0.35);
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+  .wa-fab:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(37,211,102,0.45); }
+  .wa-fab svg { width: 22px; height: 22px; fill: white; }
+
+  /* ========== ANIMATIONS ========== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 1024px) {
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid.quad { grid-template-columns: repeat(2, 1fr); }
+    .flow-steps { grid-template-columns: repeat(2, 1fr); }
+    .flow-steps::before { display: none; }
+  }
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero h1 { font-size: 2.2rem; }
+    .about-grid { grid-template-columns: 1fr; }
+    .surat-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .pricing-grid.quad { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .section-title { font-size: 1.7rem; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .services-grid { grid-template-columns: 1fr; }
+    .flow-steps { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero-stats { grid-template-columns: 1fr 1fr; }
+    .wa-fab span { display: none; }
+    .wa-fab { padding: 16px; border-radius: 50%; }
+  }
+
+  /* ========== SCROLL INDICATOR ========== */
+  .scroll-progress {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--blue-light));
+    z-index: 1001;
+    transition: width 0.1s;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    right: 28px;
+    background: var(--success);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Data rows for invoice display */
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.82rem;
+  }
+  .data-row:last-child { border-bottom: none; }
+  .data-lbl { color: rgba(255,255,255,0.4); min-width: 80px; }
+  .data-val { color: rgba(255,255,255,0.85); text-align: right; max-width: 65%; word-break: break-word; }
+
+  /* Loading spinner */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAFUAVgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKA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09e1QXtnb3Oo6fpU9rOqW0UYe5EDtvI6IGAwBnkmgDtKK4HUbO9vdUvoZo5vOMwS0cQSHyo+MMjAhV757102sz3sWliCwR5L2ceUjgcIccsT2x/OgC7bahaXiTPbTpKsLlJCp+6R1FRw6tZzm0EcpJulZoeD8wXqa5qwt7zSYNagSweJfs6vCqEyBm2leDjk8DP1q/ptlJFrNlG0LLDZ6cEVipA8x2GQD9F/WgDdN3ALprYyKJlj8xlJ6LnGaW3uYbu3S4gcPFIMqw6EVha9pr3+raaqeaqSB47hkBwYsAlSe2SB+tV9UijOrSR39lczWaQKtrFDE7Jv5zwvAPTGelAHWUVyEYvNOfQGvorqQQxS+YY0aUq5AChsZ7ZGahitbm/sbVJobmMX2pSXE6kMrIgJwD6cKv50Adbc3MNnA088gjjUgFj0GTgfqab9ttvt32Lzl+0iPzTHnkLnGfzNZviGz3eFLy1toifLg/dRoCT8uCAPXpWBcWeotfWmoRW0ou9SSWGVtp/cI2zbu9MAH8aAO0trmG6hE0EgeM5AYdDg4pzxrJG0bqGRgQykcEHtXLahawW+owWt3aXM2lw2oW3ihid1aXJzkL3xjGeOtR22mXNwmiWGoJOY41lllG5vlGcIjMPQHHXtQB0lo9lBcSafaqkbxKJGjRcABs4P6VeriGtbmbxTM11bz/2VLMsQCIeWRRt3/wCxnPtnrUvkZ8U7xa3MjPcDLPE6mBQOquPlKHHT3oA7KiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAKd/YQ6jbeRNvC7gwZGKspHQgimWOmW9gZGjMjySEF5JXLM2OnNX6KACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z" alt="HPC Logo" class="nav-logo-img">
+        <div class="nav-brand-text">
+          PT. Hirzan Prima Cipta
+          <small>Digitalize All Your Works</small>
+        </div>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#tentang">Tentang</a>
+        <a href="#layanan">Layanan</a>
+        <a href="#harga">Harga</a>
+        <a href="#alur">Alur</a>
+        <a href="#order">Order</a>
+        <a href="#surat">Surat Keterangan</a>
+        <a href="https://wa.me/6282396283773" class="nav-cta" target="_blank">&#128172; WhatsApp</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge animate-in">&#9889; Cepat &amp; Terpercaya</div>
+        <h1 class="animate-in delay-1">Solusi <em>Cek Plagiasi</em> &amp; Penulisan Akademik Profesional</h1>
+        <p class="hero-desc animate-in delay-2">Layanan lengkap cek Turnitin, parafrase, proofreading, dan pembuatan artikel ilmiah untuk mahasiswa dan akademisi di seluruh Indonesia.</p>
+        <div class="hero-btns animate-in delay-3">
+          <a href="https://wa.me/6282396283773?text=Halo%20PT.%20HPC%2C%20saya%20ingin%20menggunakan%20layanan%20cek%20plagiasi" class="btn btn-primary" target="_blank">Pesan Sekarang</a>
+          <a href="#harga" class="btn btn-outline">Lihat Harga &#8595;</a>
+        </div>
+      </div>
+      <div class="hero-card animate-in delay-2">
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="num">5rb+</span>
+            <span class="lbl">Dokumen Dicek</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num">5–15</span>
+            <span class="lbl">Menit Proses</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num">100%</span>
+            <span class="lbl">Turnitin Resmi</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num">4.9&#9733;</span>
+            <span class="lbl">Rating Klien</span>
+          </div>
+        </div>
+        <div class="hero-card-footer">
+          <span class="check">&#10003;</span> Surat keterangan bebas plagiarisme resmi
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TENTANG -->
+<section id="tentang">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <div class="section-label">Tentang Kami</div>
+        <div class="section-title">PT. Hirzan Prima Cipta</div>
+        <p class="section-desc">Perusahaan teknologi dan pengembangan software yang menyediakan layanan pengecekan plagiasi, parafrase, proofreading, dan pembuatan karya ilmiah untuk mendukung kebutuhan akademik mahasiswa dan dosen di Indonesia.</p>
+        <div class="about-features">
+          <div class="about-feature">
+            <div class="about-feature-icon">&#128274;</div>
+            <div>
+              <h4>Turnitin Berlisensi Resmi</h4>
+              <p>Akun Turnitin resmi dengan akses instructor untuk hasil yang valid dan akurat.</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">&#9889;</div>
+            <div>
+              <h4>Proses Cepat 5–15 Menit</h4>
+              <p>Hasil pengecekan plagiasi langsung dikirim ke WhatsApp Anda dalam hitungan menit.</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">&#128220;</div>
+            <div>
+              <h4>Surat Keterangan Resmi</h4>
+              <p>Dilengkapi surat keterangan bebas plagiarisme yang dapat digunakan untuk keperluan akademik.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="about-image-block">
+        <div class="about-big-text">HPC</div>
+        <h3>Digitalize All Your Works</h3>
+        <p>Kami berkomitmen membantu akademisi Indonesia menghasilkan karya ilmiah berkualitas tinggi dan bebas plagiarisme. Dengan tim yang berpengalaman di bidang penulisan akademik, kami siap menjadi mitra terbaik Anda.</p>
+        <div class="addr">
+          &#128205; Jl. Rusni S. Kabli, Kel. Hutuo, Kec. Limboto, Kab. Gorontalo<br>
+          &#128222; 082396283773
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAYANAN -->
+<section id="layanan">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Layanan Kami</div>
+      <div class="section-title">Layanan Akademik Lengkap</div>
+      <p class="section-desc">Dari pengecekan plagiasi hingga pembuatan artikel ilmiah, semua kebutuhan akademik Anda kami tangani secara profesional.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">&#128269;</div>
+        <h4>Cek Plagiasi Turnitin</h4>
+        <p>Pengecekan similarity index menggunakan Turnitin berlisensi resmi. Hasil dikirim dalam 5–15 menit ke WhatsApp Anda.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#9997;&#65039;</div>
+        <h4>Jasa Parafrase</h4>
+        <p>Parafrase profesional dengan garansi lolos Turnitin. Tersedia paket standar (2-3 hari) dan express (1 hari).</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#128218;</div>
+        <h4>Proofreading &amp; Editing</h4>
+        <p>Pengecekan tata bahasa, ejaan, dan perbaikan gaya penulisan untuk karya ilmiah Anda agar lebih rapi dan berkualitas.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#128196;</div>
+        <h4>Pembuatan Artikel Ilmiah</h4>
+        <p>Bantuan penulisan artikel ilmiah, skripsi, tesis, dan karya akademik lainnya oleh tim ahli berpengalaman.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HARGA -->
+<section id="harga">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Daftar Harga</div>
+      <div class="section-title">Harga Transparan &amp; Terjangkau</div>
+      <p class="section-desc">Pilih paket layanan sesuai kebutuhan Anda. Semua harga sudah termasuk hasil dan laporan.</p>
+    </div>
+
+    <!-- Turnitin -->
+    <div class="pricing-category">
+      <div class="pricing-cat-title">&#128269; Cek Turnitin</div>
+      <div class="pricing-grid">
+        <div class="price-card featured">
+          <div class="pkg-name">Cek Plagiasi</div>
+          <h4>Pengecekan Similarity Index</h4>
+          <div class="price">Rp 5.000</div>
+          <div class="price-note">per dokumen</div>
+          <ul>
+            <li>Hasil similarity index Turnitin</li>
+            <li>Proses 5–15 menit</li>
+            <li>Hasil dikirim via WhatsApp</li>
+            <li>Turnitin berlisensi resmi</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20cek%20plagiasi%20Turnitin" class="btn btn-gold" target="_blank">Pesan Sekarang</a>
+        </div>
+        <div class="price-card">
+          <div class="pkg-name">Surat Keterangan</div>
+          <h4>Surat Bebas Plagiarisme</h4>
+          <div class="price">Rp 10.000</div>
+          <div class="price-note">per surat</div>
+          <ul>
+            <li>Surat keterangan resmi PT. HPC</li>
+            <li>Dilengkapi nomor surat</li>
+            <li>Ditandatangani Direktur</li>
+            <li>Format PDF siap cetak</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20memesan%20surat%20keterangan%20bebas%20plagiarisme" class="btn btn-soft" target="_blank">Pesan Sekarang</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parafrase -->
+    <div class="pricing-category">
+      <div class="pricing-cat-title">&#9997;&#65039; Paket Parafrase</div>
+      <div class="pricing-grid quad">
+        <div class="price-card">
+          <div class="pkg-name">HPC-1 Standar</div>
+          <h4>Similarity Awal &lt; 50%</h4>
+          <div class="price">Rp 125.000</div>
+          <div class="price-note">per dokumen</div>
+          <ul>
+            <li>Untuk dokumen dengan hasil cek awal di bawah 50%</li>
+            <li>Pengerjaan 2–3 hari</li>
+            <li>Revisi 1x gratis</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20paket%20parafrase%20HPC-1%20Standar" class="btn btn-soft" target="_blank">Pilih Paket</a>
+        </div>
+        <div class="price-card featured">
+          <div class="pkg-name">HPC-2 Standar</div>
+          <h4>Similarity Awal &gt; 51%</h4>
+          <div class="price">Rp 150.000</div>
+          <div class="price-note">per dokumen</div>
+          <ul>
+            <li>Untuk dokumen dengan hasil cek awal di atas 51%</li>
+            <li>Pengerjaan 2–3 hari</li>
+            <li>Revisi 1x gratis</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20paket%20parafrase%20HPC-2%20Standar" class="btn btn-gold" target="_blank">Pilih Paket</a>
+        </div>
+        <div class="price-card">
+          <div class="pkg-name">HPC-1 Express</div>
+          <h4>Similarity Awal &lt; 50%</h4>
+          <div class="price">Rp 200.000</div>
+          <div class="price-note">per dokumen</div>
+          <ul>
+            <li>Untuk dokumen dengan hasil cek awal di bawah 50%</li>
+            <li>Pengerjaan 1 hari</li>
+            <li>Revisi 1x gratis</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20paket%20parafrase%20HPC-1%20Express" class="btn btn-soft" target="_blank">Pilih Paket</a>
+        </div>
+        <div class="price-card">
+          <div class="pkg-name">HPC-2 Express</div>
+          <h4>Similarity Awal &gt; 51%</h4>
+          <div class="price">Rp 225.000</div>
+          <div class="price-note">per dokumen</div>
+          <ul>
+            <li>Untuk dokumen dengan hasil cek awal di atas 51%</li>
+            <li>Pengerjaan 1 hari</li>
+            <li>Revisi 1x gratis</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20paket%20parafrase%20HPC-2%20Express" class="btn btn-soft" target="_blank">Pilih Paket</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lainnya -->
+    <div class="pricing-category">
+      <div class="pricing-cat-title">&#128196; Layanan Lainnya</div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="pkg-name">Proofreading &amp; Editing</div>
+          <h4>Perbaikan Tata Bahasa &amp; Gaya</h4>
+          <div class="price">Hubungi Kami</div>
+          <div class="price-note">harga disesuaikan</div>
+          <ul>
+            <li>Koreksi tata bahasa &amp; ejaan</li>
+            <li>Perbaikan struktur kalimat</li>
+            <li>Review keseluruhan naskah</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20konsultasi%20layanan%20proofreading" class="btn btn-soft" target="_blank">Konsultasi</a>
+        </div>
+        <div class="price-card">
+          <div class="pkg-name">Pembuatan Artikel Ilmiah</div>
+          <h4>Pendampingan Penulisan</h4>
+          <div class="price">Hubungi Kami</div>
+          <div class="price-note">harga disesuaikan</div>
+          <ul>
+            <li>Artikel jurnal &amp; konferensi</li>
+            <li>Skripsi, tesis &amp; disertasi</li>
+            <li>Bimbingan penulisan akademik</li>
+          </ul>
+          <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20konsultasi%20pembuatan%20artikel%20ilmiah" class="btn btn-soft" target="_blank">Konsultasi</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALUR -->
+<section id="alur">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Cara Pemesanan</div>
+      <div class="section-title">Alur Layanan Kami</div>
+      <p class="section-desc">Proses mudah dan cepat, hanya dalam 4 langkah sederhana.</p>
+    </div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h4>Isi Form Order</h4>
+        <p>Isi form pemesanan di website ini. Anda akan langsung mendapatkan nomor invoice.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h4>Kirim Dokumen &amp; Bayar</h4>
+        <p>Kirim dokumen dan bukti pembayaran ke admin via WhatsApp beserta nomor invoice.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h4>Proses Pengecekan</h4>
+        <p>Admin memproses dokumen Anda dan mengonfirmasi pembayaran.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <h4>Download Surat</h4>
+        <p>Masukkan nomor invoice di halaman Surat Keterangan untuk mengunduh PDF.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SURAT KETERANGAN -->
+
+<!-- ORDER FORM -->
+<section id="order">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Pemesanan</div>
+      <div class="section-title">Form Order Layanan</div>
+      <p class="section-desc">Isi form di bawah untuk memesan layanan. Anda akan langsung mendapatkan nomor invoice setelah submit.</p>
+    </div>
+
+    <div class="surat-grid">
+      <div class="surat-form">
+        <!-- STEP 1: Order Form -->
+        <div id="orderFormStep">
+          <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="orderNama" placeholder="Nama lengkap Anda">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Status</label>
+              <select id="orderStatus">
+                <option value="Mahasiswa">Mahasiswa</option>
+                <option value="Dosen">Dosen</option>
+                <option value="Peneliti">Peneliti</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Layanan</label>
+              <select id="orderLayanan">
+                <option value="">-- Pilih Layanan --</option>
+                <option value="Cek Turnitin - Rp 5.000">Cek Plagiasi (Rp 5.000)</option>
+                <option value="Surat Keterangan - Rp 10.000">Surat Keterangan (Rp 10.000)</option>
+                <option value="Parafrase HPC-1 Standar - Rp 125.000">Parafrase HPC-1 Standar (Rp 125.000)</option>
+                <option value="Parafrase HPC-2 Standar - Rp 150.000">Parafrase HPC-2 Standar (Rp 150.000)</option>
+                <option value="Parafrase HPC-1 Express - Rp 200.000">Parafrase HPC-1 Express (Rp 200.000)</option>
+                <option value="Parafrase HPC-2 Express - Rp 225.000">Parafrase HPC-2 Express (Rp 225.000)</option>
+                <option value="Proofreading">Proofreading &amp; Editing</option>
+                <option value="Pembuatan Artikel Ilmiah">Pembuatan Artikel Ilmiah</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Instansi / Perguruan Tinggi</label>
+            <input type="text" id="orderInstansi" placeholder="Contoh: Universitas Negeri Gorontalo">
+          </div>
+          <div class="form-group">
+            <label>Jurusan / Program Studi</label>
+            <input type="text" id="orderJurusan" placeholder="Contoh: Pendidikan Bahasa Inggris">
+          </div>
+          <div class="form-group">
+            <label>Judul Penelitian</label>
+            <textarea id="orderJudul" placeholder="Masukkan judul lengkap penelitian Anda"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Nomor WhatsApp</label>
+            <input type="text" id="orderWA" placeholder="Contoh: 081234567890">
+          </div>
+          <div id="orderError" style="display:none;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);color:#FCA5A5;padding:12px 16px;border-radius:8px;font-size:0.82rem;margin-bottom:14px;text-align:center;"></div>
+          <button class="btn-generate" onclick="submitOrder()" id="btnOrder">&#128203; Submit Order</button>
+        </div>
+
+        <!-- STEP 2: Invoice Result -->
+        <div id="orderResultStep" style="display:none;">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div style="font-size:3rem;margin-bottom:8px;">&#127881;</div>
+            <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:6px;">Order Berhasil!</h3>
+            <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);line-height:1.6;">Simpan nomor invoice di bawah ini. Anda akan membutuhkannya untuk mengunduh surat keterangan.</p>
+          </div>
+
+          <div style="background:rgba(74,111,165,0.2);border:2px solid rgba(74,111,165,0.4);border-radius:14px;padding:24px;text-align:center;margin-bottom:20px;">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:8px;">Nomor Invoice Anda</div>
+            <div id="resultInvoice" style="font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--yellow-light);letter-spacing:0.06em;"></div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:18px;margin-bottom:20px;">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:12px;">Langkah Selanjutnya</div>
+            <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+              <span style="background:var(--yellow);color:var(--ink);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;flex-shrink:0;">1</span>
+              <p style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.5;">Kirim <strong style="color:white;">dokumen</strong> dan <strong style="color:white;">bukti pembayaran</strong> ke WhatsApp admin beserta nomor invoice Anda.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+              <span style="background:var(--yellow);color:var(--ink);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;flex-shrink:0;">2</span>
+              <p style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.5;">Tunggu admin mengonfirmasi pembayaran dan memproses dokumen Anda.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="background:var(--yellow);color:var(--ink);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;flex-shrink:0;">3</span>
+              <p style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.5;">Setelah dikonfirmasi, buka halaman <strong style="color:white;">Surat Keterangan</strong> di website ini dan masukkan nomor invoice untuk download.</p>
+            </div>
+          </div>
+
+          <a id="btnWAOrder" href="#" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">&#128172; Kirim ke WhatsApp Admin</a>
+          <button onclick="resetOrder()" style="width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:rgba(255,255,255,0.5);font-family:inherit;font-size:0.85rem;cursor:pointer;margin-top:10px;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">&#43; Buat Order Baru</button>
+        </div>
+      </div>
+
+      <div class="surat-info">
+        <h3>Cara Order</h3>
+        <p>Isi form di samping dengan data Anda. Setelah submit, Anda akan langsung mendapatkan nomor invoice yang bisa digunakan untuk mengunduh surat keterangan setelah proses selesai.</p>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-top:20px;">
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.7;">
+            <p style="margin-bottom:12px;"><strong style="color:white;">&#9888;&#65039; Penting:</strong></p>
+            <p style="margin-bottom:8px;">&#8226; Nomor invoice hanya bisa digunakan untuk download surat setelah admin mengonfirmasi pembayaran Anda.</p>
+            <p style="margin-bottom:8px;">&#8226; Surat keterangan hanya tersedia untuk layanan yang sudah selesai diproses.</p>
+            <p style="margin-bottom:8px;">&#8226; Simpan nomor invoice Anda baik-baik. Screenshot halaman ini setelah order berhasil.</p>
+            <p>&#8226; Hubungi admin via WhatsApp jika ada pertanyaan.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SURAT KETERANGAN -->
+<section id="surat">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Fitur Khusus</div>
+      <div class="section-title">Generate Surat Keterangan Bebas Plagiarisme</div>
+      <p class="section-desc">Masukkan nomor invoice yang Anda dapatkan saat order untuk mengunduh surat keterangan bebas plagiarisme dalam format PDF.</p>
+    </div>
+
+    <div class="surat-grid">
+      <div class="surat-form">
+        <!-- STEP 1: Invoice Verification -->
+        <div id="stepVerify">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div style="font-size:2.5rem;margin-bottom:8px;">&#128274;</div>
+            <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:6px;">Verifikasi Invoice</h3>
+            <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.6;">Masukkan nomor invoice yang Anda terima setelah pembayaran untuk mengunduh surat keterangan.</p>
+          </div>
+          <div class="form-group">
+            <label>Nomor Invoice</label>
+            <input type="text" id="invoiceInput" placeholder="Contoh: INV-HPC-0001" style="text-transform:uppercase;font-weight:600;letter-spacing:0.05em;font-size:1rem;padding:16px;text-align:center;">
+          </div>
+          <div id="verifyError" style="display:none;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);color:#FCA5A5;padding:12px 16px;border-radius:8px;font-size:0.82rem;margin-bottom:14px;text-align:center;"></div>
+          <button class="btn-generate" onclick="verifyInvoice()" id="btnVerify">&#128269; Verifikasi Invoice</button>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);text-align:center;">
+            <p style="font-size:0.75rem;color:rgba(255,255,255,0.35);">Belum punya invoice? <a href="https://wa.me/6282396283773?text=Halo%2C%20saya%20ingin%20menggunakan%20layanan%20cek%20plagiasi" target="_blank" style="color:var(--yellow-light);text-decoration:none;font-weight:600;">Hubungi kami</a></p>
+          </div>
+        </div>
+
+        <!-- STEP 2: Data Review & Generate -->
+        <div id="stepGenerate" style="display:none;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            <div style="width:36px;height:36px;background:rgba(22,163,74,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">&#10003;</div>
+            <div>
+              <div style="font-size:0.78rem;font-weight:700;color:#4ADE80;text-transform:uppercase;letter-spacing:0.06em;">Invoice Terverifikasi</div>
+              <div id="showInvoice" style="font-size:0.85rem;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;"></div>
+            </div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:18px;margin-bottom:20px;">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:12px;">Data Surat Keterangan</div>
+            <div class="data-row"><span class="data-lbl">Nomor Surat</span><span class="data-val" id="showNomor"></span></div>
+            <div class="data-row"><span class="data-lbl">Nama</span><span class="data-val" id="showNama"></span></div>
+            <div class="data-row"><span class="data-lbl">Status</span><span class="data-val" id="showStatus"></span></div>
+            <div class="data-row"><span class="data-lbl">Instansi</span><span class="data-val" id="showInstansi"></span></div>
+            <div class="data-row"><span class="data-lbl">Jurusan</span><span class="data-val" id="showJurusan"></span></div>
+            <div class="data-row"><span class="data-lbl">Judul</span><span class="data-val" id="showJudul"></span></div>
+            <div class="data-row"><span class="data-lbl">Similarity</span><span class="data-val" id="showSim" style="font-weight:700;color:#4ADE80;"></span></div>
+            <div class="data-row"><span class="data-lbl">Tanggal</span><span class="data-val" id="showTanggal"></span></div>
+          </div>
+
+          <div id="downloadInfo" style="background:rgba(74,111,165,0.15);border:1px solid rgba(74,111,165,0.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--blue-light);"></div>
+
+          <button class="btn-generate" onclick="generateFromInvoice()" id="btnGenerate">&#128196; Generate &amp; Unduh PDF</button>
+          <button onclick="resetForm()" style="width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:rgba(255,255,255,0.5);font-family:inherit;font-size:0.85rem;cursor:pointer;margin-top:10px;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">&#8592; Verifikasi Invoice Lain</button>
+        </div>
+      </div>
+
+      <div class="surat-info">
+        <h3>Contoh Surat Keterangan</h3>
+        <p>Surat keterangan bebas plagiarisme diterbitkan secara resmi oleh PT. Hirzan Prima Cipta dan ditandatangani oleh Direktur. Surat ini dapat digunakan untuk keperluan akademik di perguruan tinggi.</p>
+        <div class="surat-preview">
+          <div class="sp-watermark">HPC</div>
+          <div class="sp-header">
+            <h4>PT. HIRZAN PRIMA CIPTA</h4>
+            <p>Perusahaan Teknologi dan Pengembangan Software</p>
+            <small>Jl. Rusni S. Kabli, Kel. Hutuo, Kec. Limboto, Kab. Gorontalo</small>
+          </div>
+          <div class="sp-title">SURAT KETERANGAN BEBAS PLAGIARISME</div>
+          <div class="sp-body">
+            <div class="sp-line"><span class="sp-lbl">Nama</span>: Sri Alhasni Husaini</div>
+            <div class="sp-line"><span class="sp-lbl">Status</span>: Mahasiswa</div>
+            <div class="sp-line"><span class="sp-lbl">Instansi</span>: IAIN Sultan Amai Gorontalo</div>
+            <div class="sp-line"><span class="sp-lbl">Similarity</span>: <strong>28%</strong></div>
+            <br>
+            <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+              <div style="text-align:center;">
+                <div style="font-size:0.6rem;font-weight:600;color:#333;margin-bottom:6px;">Direktur</div>
+                <div style="width:48px;height:48px;background:repeating-conic-gradient(#1E2A3A 0% 25%, white 0% 50%) 0 0/6px 6px;border:1px solid #ccc;border-radius:3px;margin:0 auto 4px;"></div>
+                <div style="font-size:0.48rem;color:#999;margin-bottom:4px;">Ditandatangani secara elektronik</div>
+                <div style="font-size:0.58rem;font-weight:700;color:#1E2A3A;">Hasan Ayuba, M.Pd.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>PT. Hirzan Prima Cipta</h4>
+        <p>Perusahaan Teknologi dan Pengembangan Software. Menyediakan layanan cek plagiasi Turnitin, parafrase, proofreading, dan pembuatan artikel ilmiah untuk akademisi di seluruh Indonesia.</p>
+        <p style="margin-top:12px;font-size:0.8rem;color:rgba(255,255,255,0.35);">&#128205; Jl. Rusni S. Kabli, Kel. Hutuo, Kec. Limboto, Kab. Gorontalo</p>
+      </div>
+      <div>
+        <h4>Layanan</h4>
+        <ul class="footer-links">
+          <li><a href="#harga">Cek Plagiasi Turnitin</a></li>
+          <li><a href="#harga">Jasa Parafrase</a></li>
+          <li><a href="#harga">Proofreading</a></li>
+          <li><a href="#harga">Pembuatan Artikel</a></li>
+          <li><a href="#surat">Surat Keterangan</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Navigasi</h4>
+        <ul class="footer-links">
+          <li><a href="#tentang">Tentang Kami</a></li>
+          <li><a href="#layanan">Layanan</a></li>
+          <li><a href="#harga">Daftar Harga</a></li>
+          <li><a href="#alur">Cara Pemesanan</a></li>
+          <li><a href="#order">Order Layanan</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Hubungi Kami</h4>
+        <ul class="footer-links">
+          <li><a href="https://wa.me/6282396283773" target="_blank">&#128172; WhatsApp</a></li>
+          <li><a href="tel:082396283773">&#128222; 082396283773</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 PT. Hirzan Prima Cipta. All rights reserved.</span>
+      <span>Digitalize All Your Works</span>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
+<a href="https://wa.me/6282396283773?text=Halo%20PT.%20HPC%2C%20saya%20ingin%20bertanya%20tentang%20layanan" class="wa-fab" target="_blank">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span>Chat WhatsApp</span>
+</a>
+
+<!-- TOAST -->
+<div class="toast" id="toast">&#10003; Surat berhasil diunduh!</div>
+
+<!-- Hidden QR container -->
+<div id="qrContainer" style="position:absolute;left:-9999px;top:-9999px;"></div>
+
+<script>
+// ============================================================
+// KONFIGURASI: Ganti URL ini dengan URL Web App Google Apps Script Anda
+// ============================================================
+const API_URL = 'https://script.google.com/macros/s/AKfycbxPeEOVgR643DRF3Xd9LsLfOXqiQBI0rLvSWEmmMJGa3-2-467p2xCMjSIMOD7H29F7DA/exec';
+
+// Logo PT. HPC (base64)
+const LOGO_B64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAFUAVgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKA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09e1QXtnb3Oo6fpU9rOqW0UYe5EDtvI6IGAwBnkmgDtKK4HUbO9vdUvoZo5vOMwS0cQSHyo+MMjAhV757102sz3sWliCwR5L2ceUjgcIccsT2x/OgC7bahaXiTPbTpKsLlJCp+6R1FRw6tZzm0EcpJulZoeD8wXqa5qwt7zSYNagSweJfs6vCqEyBm2leDjk8DP1q/ptlJFrNlG0LLDZ6cEVipA8x2GQD9F/WgDdN3ALprYyKJlj8xlJ6LnGaW3uYbu3S4gcPFIMqw6EVha9pr3+raaqeaqSB47hkBwYsAlSe2SB+tV9UijOrSR39lczWaQKtrFDE7Jv5zwvAPTGelAHWUVyEYvNOfQGvorqQQxS+YY0aUq5AChsZ7ZGahitbm/sbVJobmMX2pSXE6kMrIgJwD6cKv50Adbc3MNnA088gjjUgFj0GTgfqab9ttvt32Lzl+0iPzTHnkLnGfzNZviGz3eFLy1toifLg/dRoCT8uCAPXpWBcWeotfWmoRW0ou9SSWGVtp/cI2zbu9MAH8aAO0trmG6hE0EgeM5AYdDg4pzxrJG0bqGRgQykcEHtXLahawW+owWt3aXM2lw2oW3ihid1aXJzkL3xjGeOtR22mXNwmiWGoJOY41lllG5vlGcIjMPQHHXtQB0lo9lBcSafaqkbxKJGjRcABs4P6VeriGtbmbxTM11bz/2VLMsQCIeWRRt3/wCxnPtnrUvkZ8U7xa3MjPcDLPE6mBQOquPlKHHT3oA7KiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAKd/YQ6jbeRNvC7gwZGKspHQgimWOmW9gZGjMjySEF5JXLM2OnNX6KACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z';
+
+
+// Navbar scroll
+window.addEventListener('scroll', () => {
+  const navbar = document.getElementById('navbar');
+  const progress = document.getElementById('scrollProgress');
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  navbar.classList.toggle('scrolled', scrollTop > 10);
+  progress.style.width = (scrollTop / docHeight * 100) + '%';
+});
+
+const bulanIndo = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+let currentData = null;
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg || '&#10003; Surat berhasil diunduh!';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showError(msg) {
+  const el = document.getElementById('verifyError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideError() {
+  document.getElementById('verifyError').style.display = 'none';
+}
+
+// Enter key support
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('invoiceInput');
+  if (input) input.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyInvoice(); });
+});
+
+// ====== ORDER FORM ======
+function showOrderError(msg) {
+  const el = document.getElementById('orderError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideOrderError() {
+  document.getElementById('orderError').style.display = 'none';
+}
+
+async function submitOrder() {
+  hideOrderError();
+  const nama = document.getElementById('orderNama').value.trim();
+  const status = document.getElementById('orderStatus').value;
+  const layanan = document.getElementById('orderLayanan').value;
+  const instansi = document.getElementById('orderInstansi').value.trim();
+  const jurusan = document.getElementById('orderJurusan').value.trim();
+  const judul = document.getElementById('orderJudul').value.trim();
+  const wa = document.getElementById('orderWA').value.trim();
+
+  if (!nama || !layanan || !instansi || !jurusan || !judul || !wa) {
+    showOrderError('Mohon lengkapi semua field terlebih dahulu.');
+    return;
+  }
+
+  const btn = document.getElementById('btnOrder');
+  btn.classList.add('btn-loading');
+
+  try {
+    const params = new URLSearchParams({
+      action: 'createOrder',
+      nama: nama,
+      status: status,
+      layanan: layanan,
+      instansi: instansi,
+      jurusan: jurusan,
+      judul: judul,
+      wa: wa
+    });
+
+    const response = await fetch(API_URL + '?' + params.toString());
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      document.getElementById('resultInvoice').textContent = result.invoice;
+      
+      // Setup WA button with invoice info
+      const waMsg = 'Halo Admin PT. HPC,%0ASaya telah melakukan order dengan:%0A%0ANomor Invoice: ' + result.invoice + '%0ANama: ' + nama + '%0ALayanan: ' + layanan + '%0A%0AMohon diproses. Terima kasih.';
+      document.getElementById('btnWAOrder').href = 'https://wa.me/6282396283773?text=' + waMsg;
+      
+      document.getElementById('orderFormStep').style.display = 'none';
+      document.getElementById('orderResultStep').style.display = 'block';
+    } else {
+      showOrderError(result.message || 'Gagal membuat order. Silakan coba lagi.');
+    }
+  } catch (err) {
+    showOrderError('Gagal terhubung ke server. Pastikan koneksi internet Anda aktif.');
+    console.error(err);
+  }
+
+  btn.classList.remove('btn-loading');
+}
+
+function resetOrder() {
+  document.getElementById('orderFormStep').style.display = 'block';
+  document.getElementById('orderResultStep').style.display = 'none';
+  document.getElementById('orderNama').value = '';
+  document.getElementById('orderLayanan').value = '';
+  document.getElementById('orderInstansi').value = '';
+  document.getElementById('orderJurusan').value = '';
+  document.getElementById('orderJudul').value = '';
+  document.getElementById('orderWA').value = '';
+  hideOrderError();
+}
+
+// ====== VERIFY INVOICE ======
+async function verifyInvoice() {
+  const invoice = document.getElementById('invoiceInput').value.trim().toUpperCase();
+  hideError();
+  if (!invoice) { showError('Mohon masukkan nomor invoice.'); return; }
+
+  const btn = document.getElementById('btnVerify');
+  btn.classList.add('btn-loading');
+
+  try {
+    const response = await fetch(API_URL + '?action=verify&invoice=' + encodeURIComponent(invoice));
+    const result = await response.json();
+    if (result.status === 'success') {
+      currentData = result.data;
+      displayData(currentData);
+      document.getElementById('stepVerify').style.display = 'none';
+      document.getElementById('stepGenerate').style.display = 'block';
+    } else {
+      showError(result.message || 'Nomor invoice tidak ditemukan.');
+    }
+  } catch (err) {
+    showError('Gagal terhubung ke server. Pastikan koneksi internet Anda aktif.');
+    console.error(err);
+  }
+  btn.classList.remove('btn-loading');
+}
+
+function displayData(d) {
+  document.getElementById('showInvoice').textContent = d.invoice;
+  document.getElementById('showNomor').textContent = d.nomorSurat;
+  document.getElementById('showNama').textContent = d.nama;
+  document.getElementById('showStatus').textContent = d.status;
+  document.getElementById('showInstansi').textContent = d.instansi;
+  document.getElementById('showJurusan').textContent = d.jurusan;
+  document.getElementById('showJudul').textContent = d.judul;
+  document.getElementById('showSim').textContent = d.similarity + '%';
+  document.getElementById('showTanggal').textContent = d.tanggal;
+
+  // Show download info
+  const dlCount = d.downloadCount || 0;
+  const maxDl = d.maxDownload || 2;
+  const remaining = maxDl - dlCount;
+  const dlInfo = document.getElementById('downloadInfo');
+  dlInfo.innerHTML = '&#9432; Kesempatan download tersisa: <strong>' + remaining + 'x</strong> dari maksimal ' + maxDl + 'x';
+}
+
+function resetForm() {
+  document.getElementById('stepVerify').style.display = 'block';
+  document.getElementById('stepGenerate').style.display = 'none';
+  document.getElementById('invoiceInput').value = '';
+  currentData = null;
+  hideError();
+}
+
+async function markDownloaded(invoice) {
+  try { 
+    const r = await fetch(API_URL + '?action=markDownloaded&invoice=' + encodeURIComponent(invoice)); 
+    return await r.json();
+  } catch (e) { console.error(e); return { status: 'error' }; }
+}
+
+// ====== DIGITAL STAMP ======
+function createStampImage() {
+  const size = 400, canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d'), cx = size/2, cy = size/2;
+
+  ctx.beginPath(); ctx.arc(cx,cy,180,0,Math.PI*2); ctx.strokeStyle='#2C5F8A'; ctx.lineWidth=8; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,165,0,Math.PI*2); ctx.strokeStyle='#2C5F8A'; ctx.lineWidth=3; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,90,0,Math.PI*2); ctx.strokeStyle='#2C5F8A'; ctx.lineWidth=3; ctx.stroke();
+
+  // Top text
+  ctx.save(); ctx.translate(cx,cy); ctx.fillStyle='#2C5F8A'; ctx.font='bold 22px Arial'; ctx.textAlign='center';
+  const tt='PT. HIRZAN PRIMA CIPTA', tr=130, tas=-Math.PI-0.15, tap=Math.PI*0.82;
+  for(let i=0;i<tt.length;i++){const a=tas+(i/(tt.length-1))*tap;ctx.save();ctx.translate(tr*Math.cos(a),tr*Math.sin(a));ctx.rotate(a+Math.PI/2);ctx.fillText(tt[i],0,0);ctx.restore();}
+  ctx.restore();
+
+  // Bottom text
+  ctx.save(); ctx.translate(cx,cy); ctx.fillStyle='#2C5F8A'; ctx.font='bold 22px Arial'; ctx.textAlign='center';
+  const bt='DIREKTUR', br=130, bas=0.28, bap=Math.PI*0.44;
+  for(let i=0;i<bt.length;i++){const a=bas+(i/(bt.length-1))*bap;ctx.save();ctx.translate(br*Math.cos(a),br*Math.sin(a));ctx.rotate(a-Math.PI/2);ctx.scale(1,-1);ctx.fillText(bt[i],0,0);ctx.restore();}
+  ctx.restore();
+
+  ctx.fillStyle='#2C5F8A'; ctx.font='bold 28px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('\u2605',cx-145,cy); ctx.fillText('\u2605',cx+145,cy);
+  ctx.font='bold 48px Arial'; ctx.fillText('HPC',cx,cy-10);
+  ctx.font='14px Arial'; ctx.fillText('Digitalize All Your Works',cx,cy+22);
+
+  for(let i=0;i<36;i++){const a=(i/36)*Math.PI*2;ctx.beginPath();ctx.arc(cx+175*Math.cos(a),cy+175*Math.sin(a),2,0,Math.PI*2);ctx.fillStyle='#2C5F8A';ctx.fill();}
+  return canvas.toDataURL('image/png');
+}
+
+// ====== QR CODE ======
+function generateQRCode(data) {
+  return new Promise((resolve) => {
+    const container = document.getElementById('qrContainer');
+    container.innerHTML = '';
+    new QRCode(container, { text:data, width:256, height:256, colorDark:'#1E2A3A', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M });
+    setTimeout(() => {
+      const c = container.querySelector('canvas');
+      if(c){resolve(c.toDataURL('image/png'));return;}
+      const img = container.querySelector('img');
+      if(img){const cv=document.createElement('canvas');cv.width=256;cv.height=256;cv.getContext('2d').drawImage(img,0,0,256,256);resolve(cv.toDataURL('image/png'));}
+      else resolve(null);
+    }, 500);
+  });
+}
+
+// ====== GENERATE PDF FROM INVOICE DATA ======
+async function generateFromInvoice() {
+  if (!currentData) return;
+  const btn = document.getElementById('btnGenerate');
+  btn.classList.add('btn-loading');
+  const d = currentData;
+  const { jsPDF } = window.jspdf;
+
+  const verif = JSON.stringify({doc:'Surat Keterangan Bebas Plagiarisme',invoice:d.invoice,nomor:d.nomorSurat,nama:d.nama,instansi:d.instansi,similarity:d.similarity+'%',tanggal:d.tanggal,penerbit:'PT. Hirzan Prima Cipta',direktur:'Hasan Ayuba, M.Pd',verifikasi:'VALID'});
+  const qrImg = await generateQRCode(verif);
+
+  const doc = new jsPDF('p','mm','a4');
+  const pw=210, m=25, cw=pw-m*2;
+
+  // Add logo to header (left side only, bigger)
+  try {
+    doc.addImage(LOGO_B64,'JPEG',m,14,24,24);
+  } catch(e) { console.log('Logo error:', e); }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  doc.text('PT. HIRZAN PRIMA CIPTA',pw/2+8,23,{align:'center'});
+  doc.setFont('helvetica','italic'); doc.setFontSize(10);
+  doc.text('Perusahaan Teknologi dan Pengembangan Software',pw/2+8,30,{align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+  doc.text('Alamat: Jl. Rusni S. Kabli, Kelurahan Hutuo, Kecamatan Limboto, Kabupaten Gorontalo',pw/2+8,36,{align:'center'});
+  doc.text('Telp. 082396283773',pw/2+8,41,{align:'center'});
+
+  doc.setLineWidth(0.8); doc.line(m,45,pw-m,45);
+  doc.setLineWidth(0.3); doc.line(m,46.5,pw-m,46.5);
+
+  let y=55;
+  doc.setFont('helvetica','bold'); doc.setFontSize(12);
+  doc.text('SURAT KETERANGAN BEBAS PLAGIARISME',pw/2,y,{align:'center'});
+  y+=6; doc.setFontSize(10);
+  doc.text('Nomor: '+d.nomorSurat,pw/2,y,{align:'center'});
+
+  y+=10; doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('Yang bertanda tangan di bawah ini:',m,y);
+
+  y+=8; doc.setFont('helvetica','normal');
+  const lx=m, vx=m+40;
+  doc.text('Nama',lx,y); doc.text(': Hasan Ayuba, M.Pd',vx,y);
+  y+=6; doc.text('Jabatan',lx,y); doc.text(': Direktur PT. HIRZAN PRIMA CIPTA',vx,y);
+  y+=9; doc.text('Dengan ini menerangkan bahwa:',m,y);
+
+  y+=8; doc.text('Nama',lx,y); doc.text(': '+d.nama,vx,y);
+  y+=6; doc.text('Status',lx,y); doc.text(': '+d.status,vx,y);
+  y+=6; doc.text('Instansi',lx,y); doc.text(': '+d.instansi,vx,y);
+  y+=6; doc.text('Jurusan',lx,y); doc.text(': '+d.jurusan,vx,y);
+  y+=6; doc.text('Judul Penelitian',lx,y);
+
+  const jl=doc.splitTextToSize(': '+d.judul,cw-40); doc.text(jl,vx,y); y+=jl.length*5.5;
+
+  y+=8;
+  const para='Penelitian di atas sudah melewati proses pengecekan plagiasi dan dinyatakan sudah memenuhi syarat batas maksimal plagiasi. Hasil plagiasi terbaca '+d.similarity+' similarity index pada naskah penelitian.';
+  const pl=doc.splitTextToSize(para,cw); doc.text(pl,m,y); y+=pl.length*5.5;
+  y+=6; doc.text('Demikian Surat Keterangan ini dibuat agar dapat digunakan seperlunya.',m,y);
+
+  // Format tanggal: "Gorontalo, 03 Maret 2026"
+  const tglParts = d.tanggal.split(' ');
+  let tglFormatted = d.tanggal;
+  if (tglParts.length >= 3) {
+    const day = tglParts[0].padStart(2, '0');
+    tglFormatted = day + ' ' + tglParts.slice(1).join(' ');
+  }
+
+  // Signature area
+  y+=14; const sx=pw-m-60;
+  doc.text('Gorontalo, '+tglFormatted,sx,y);
+  y+=6; doc.setFont('helvetica','bold'); doc.text('Direktur',sx,y);
+
+  // QR Code as electronic signature (centered in signature area)
+  if(qrImg){
+    const qrSig=30;
+    const qrSigX=sx+10;
+    y+=4;
+    doc.addImage(qrImg,'PNG',qrSigX,y,qrSig,qrSig);
+    y+=qrSig+3;
+  } else {
+    y+=20;
+  }
+
+  // "Ditandatangani secara elektronik" text
+  doc.setFont('helvetica','normal'); doc.setFontSize(7);
+  doc.setTextColor(100,100,100);
+  doc.text('Ditandatangani secara elektronik',sx,y);
+  doc.setTextColor(0,0,0);
+  y+=6;
+
+  // Nama penandatangan
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('Hasan Ayuba, M.Pd.',sx,y);
+
+  // Footer
+  doc.setLineWidth(0.3); doc.line(m,280,pw-m,280);
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.text('PT. HIRZAN PRIMA CIPTA',m,284);
+  doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(120,120,120);
+  doc.text('Dokumen ini ditandatangani secara elektronik dan sah tanpa memerlukan tanda tangan basah.',m,288);
+  doc.setFontSize(5.5); doc.text('Invoice: '+d.invoice,m,291);
+  doc.setTextColor(0,0,0);
+
+  doc.save('Surat_Keterangan_'+d.nama.replace(/\s+/g,'_')+'.pdf');
+  const dlResult = await markDownloaded(d.invoice);
+  btn.classList.remove('btn-loading');
+
+  // Update download count
+  const newCount = (d.downloadCount || 0) + 1;
+  const maxDl = d.maxDownload || 2;
+  const remaining = maxDl - newCount;
+
+  if (remaining <= 0) {
+    btn.disabled=true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
+    btn.innerHTML='&#10003; Batas Download Tercapai ('+maxDl+'x)';
+    showToast('&#10003; Surat berhasil diunduh! (Download terakhir)');
+  } else {
+    showToast('&#10003; Surat berhasil diunduh! Sisa kesempatan: '+remaining+'x');
+    btn.innerHTML='&#128196; Download Lagi (sisa '+remaining+'x)';
+    // Update currentData count for next click
+    currentData.downloadCount = newCount;
+  }
+}
+</script>
+
+</body>
+</html>
