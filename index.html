@@ -791,9 +791,11 @@
     .flow-steps::before { display: none; }
   }
   @media (max-width: 768px) {
+    .hero { padding: 110px 0 60px; }
     .hero-grid { grid-template-columns: 1fr; gap: 40px; }
     .hero h1 { font-size: 2.2rem; }
     .about-grid { grid-template-columns: 1fr; }
+    .about-image-block { min-height: 300px; padding: 24px; }
     .surat-grid { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr 1fr; }
     .pricing-grid { grid-template-columns: 1fr; }
@@ -820,6 +822,10 @@
     .flow-steps { grid-template-columns: 1fr; }
     .hero h1 { font-size: 1.8rem; }
     .hero-stats { grid-template-columns: 1fr 1fr; }
+    .hero-btns .btn { width: 100%; justify-content: center; }
+    .hero-card { padding: 20px; }
+    .price-card { padding: 20px 16px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
     .wa-fab span { display: none; }
     .wa-fab { padding: 16px; border-radius: 50%; }
   }
@@ -1055,7 +1061,7 @@
         <div class="price-card featured">
           <div class="pkg-name">Cek Plagiasi</div>
           <h4>Pengecekan Similarity Index</h4>
-          <div class="price">Rp 5.000</div>
+          <div class="price">Rp 10.000</div>
           <div class="price-note">per dokumen</div>
           <ul>
             <li>Hasil similarity index Turnitin</li>
@@ -1088,7 +1094,7 @@
         <div class="price-card">
           <div class="pkg-name">HPC-1 Standar</div>
           <h4>Similarity Awal &lt; 50%</h4>
-          <div class="price">Rp 125.000</div>
+          <div class="price">Rp 135.000</div>
           <div class="price-note">per dokumen</div>
           <ul>
             <li>Untuk dokumen dengan hasil cek awal di bawah 50%</li>
@@ -1234,9 +1240,9 @@
               <label>Layanan</label>
               <select id="orderLayanan">
                 <option value="">-- Pilih Layanan --</option>
-                <option value="Cek Turnitin - Rp 5.000">Cek Plagiasi (Rp 5.000)</option>
+                <option value="Cek Turnitin - Rp 10.000">Cek Plagiasi (Rp 10.000)</option>
                 <option value="Surat Keterangan - Rp 10.000">Surat Keterangan (Rp 10.000)</option>
-                <option value="Parafrase HPC-1 Standar - Rp 125.000">Parafrase HPC-1 Standar (Rp 125.000)</option>
+                <option value="Parafrase HPC-1 Standar - Rp 135.000">Parafrase HPC-1 Standar (Rp 135.000)</option>
                 <option value="Parafrase HPC-2 Standar - Rp 150.000">Parafrase HPC-2 Standar (Rp 150.000)</option>
                 <option value="Parafrase HPC-1 Express - Rp 200.000">Parafrase HPC-1 Express (Rp 200.000)</option>
                 <option value="Parafrase HPC-2 Express - Rp 225.000">Parafrase HPC-2 Express (Rp 225.000)</option>
