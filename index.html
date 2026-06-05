@@ -1645,11 +1645,88 @@ function resetForm() {
 }
 
 async function markDownloaded(invoice) {
-  try { 
-    const r = await fetch(API_URL + '?action=markDownloaded&invoice=' + encodeURIComponent(invoice)); 
+  try {
+    const r = await fetch(API_URL + '?action=markDownloaded&invoice=' + encodeURIComponent(invoice));
     return await r.json();
   } catch (e) { console.error(e); return { status: 'error' }; }
 }
+
+// ====== KEASLIAN & VERIFIKASI ELEKTRONIK ======
+// Kode keaslian = sidik jari (SHA-256) dari data inti dokumen. Mendeteksi pemalsuan/perubahan.
+async function sha256Hex(str){
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
+}
+function canonicalDocString(d){
+  return [d.invoice, d.nomorSurat, d.nama, d.instansi, d.similarity, d.tanggal].join('|');
+}
+async function docAuthCode(d){
+  const h = await sha256Hex(canonicalDocString(d));
+  const s = h.slice(0,12).toUpperCase();
+  return s.slice(0,4) + '-' + s.slice(4,8) + '-' + s.slice(8,12);
+}
+function getImgDims(src){
+  return new Promise(r => { const i = new Image(); i.onload = () => r({w:i.naturalWidth, h:i.naturalHeight}); i.onerror = () => r({w:1,h:1}); i.src = src; });
+}
+function vvEsc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function vvResultHtml(kind, title, desc, d){
+  const c = kind === 'valid' ? '#16A34A' : kind === 'warn' ? '#D97706' : '#DC2626';
+  const icon = kind === 'valid' ? '&#10003;' : kind === 'warn' ? '!' : '&#10005;';
+  let rows = '';
+  if (d) {
+    rows = [['No. Surat',d.nomorSurat],['Nama',d.nama],['Instansi',d.instansi],['Jurusan',d.jurusan],['Judul',d.judul],['Similarity',d.similarity+'%'],['Tanggal',d.tanggal],['Invoice',d.invoice]]
+      .map(r => `<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #F1F5F9;font-size:13.5px;"><div style="min-width:104px;color:#64748B;font-weight:600;">${r[0]}</div><div style="color:#0F172A;">${vvEsc(String(r[1] ?? '-'))}</div></div>`).join('');
+  }
+  return `<div style="text-align:center;margin-bottom:18px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:${c}1a;color:${c};display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;margin:0 auto 12px;">${icon}</div>
+      <h2 style="margin:0;color:#0F172A;font-size:19px;">${title}</h2>
+      <p style="margin:8px 0 0;color:#475569;font-size:14px;line-height:1.6;">${desc}</p>
+    </div>
+    ${rows ? `<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px;">${rows}</div>` : ''}
+    <p style="text-align:center;color:#94A3B8;font-size:11px;margin-top:18px;">Verifikasi resmi PT. Hirzan Prima Cipta &middot; <a href="${location.pathname}" style="color:#2563EB;text-decoration:none;">Kembali ke Beranda</a></p>`;
+}
+
+async function runPublicVerify(invoice, k){
+  document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0B1622;font-family:'Inter',system-ui,sans-serif;padding:24px;">
+    <div id="vvCard" style="max-width:560px;width:100%;background:#fff;border-radius:18px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+      <div style="text-align:center;color:#475569;font-family:'Inter',system-ui,sans-serif;">Memverifikasi dokumen&hellip;</div>
+    </div></div>`;
+  const card = document.getElementById('vvCard');
+  try {
+    const resp = await fetch(API_URL + '?action=verify&invoice=' + encodeURIComponent(invoice));
+    const res = await resp.json();
+    if (!res || res.status !== 'success') {
+      card.innerHTML = vvResultHtml('invalid', 'Dokumen Tidak Ditemukan',
+        'Nomor invoice <b>' + vvEsc(invoice) + '</b> tidak terdaftar pada sistem PT. Hirzan Prima Cipta. Dokumen kemungkinan tidak resmi.', null);
+      return;
+    }
+    const d = res.data;
+    const expected = (await docAuthCode(d)).replace(/-/g,'');
+    const provided = (k || '').toUpperCase().replace(/-/g,'');
+    const match = provided.length > 0 && expected === provided;
+    card.innerHTML = vvResultHtml(
+      match ? 'valid' : 'warn',
+      match ? 'Dokumen ASLI &amp; Terverifikasi' : 'Terdaftar, namun Kode Keaslian Tidak Cocok',
+      match
+        ? 'Surat keterangan ini benar diterbitkan oleh PT. Hirzan Prima Cipta dan seluruh datanya cocok dengan catatan resmi.'
+        : 'Nomor invoice terdaftar, tetapi kode keaslian pada dokumen tidak sesuai dengan catatan resmi. Dokumen mungkin telah diubah. Mohon konfirmasi ke penerbit.',
+      d);
+  } catch (e) {
+    card.innerHTML = vvResultHtml('invalid', 'Gagal Memverifikasi',
+      'Tidak dapat terhubung ke server verifikasi. Periksa koneksi internet lalu coba lagi.', null);
+  }
+}
+
+// Bila QR dipindai (URL memuat ?verify=INVOICE&k=KODE), tampilkan hasil verifikasi.
+(function(){
+  const p = new URLSearchParams(location.search);
+  const inv = p.get('verify');
+  if (!inv) return;
+  const run = () => runPublicVerify(inv, p.get('k'));
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+})();
 
 // ====== DIGITAL STAMP ======
 function createStampImage() {
@@ -1687,14 +1764,25 @@ function generateQRCode(data) {
   return new Promise((resolve) => {
     const container = document.getElementById('qrContainer');
     container.innerHTML = '';
-    new QRCode(container, { text:data, width:256, height:256, colorDark:'#1E2A3A', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M });
+    new QRCode(container, {
+      text: data,
+      width: 512,
+      height: 512,
+      colorDark: '#1E2A3A',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
     setTimeout(() => {
       const c = container.querySelector('canvas');
-      if(c){resolve(c.toDataURL('image/png'));return;}
+      if (c) { resolve(c.toDataURL('image/png')); return; }
       const img = container.querySelector('img');
-      if(img){const cv=document.createElement('canvas');cv.width=256;cv.height=256;cv.getContext('2d').drawImage(img,0,0,256,256);resolve(cv.toDataURL('image/png'));}
-      else resolve(null);
-    }, 500);
+      if (img) {
+        const cv = document.createElement('canvas');
+        cv.width = 512; cv.height = 512;
+        cv.getContext('2d').drawImage(img, 0, 0, 512, 512);
+        resolve(cv.toDataURL('image/png'));
+      } else resolve(null);
+    }, 600);
   });
 }
 
@@ -1706,57 +1794,142 @@ async function generateFromInvoice() {
   const d = currentData;
   const { jsPDF } = window.jspdf;
 
-  const verif = JSON.stringify({doc:'Surat Keterangan Bebas Plagiarisme',invoice:d.invoice,nomor:d.nomorSurat,nama:d.nama,instansi:d.instansi,similarity:d.similarity+'%',tanggal:d.tanggal,penerbit:'PT. Hirzan Prima Cipta',direktur:'Hasan Ayuba, M.Pd',verifikasi:'VALID'});
-  const qrImg = await generateQRCode(verif);
+  // Kode keaslian (sidik jari dokumen) + URL verifikasi publik yang dibuka saat QR dipindai.
+  const authCode = await docAuthCode(d);
+  const verifyUrl = location.origin + location.pathname + '?verify=' + encodeURIComponent(d.invoice) + '&k=' + authCode.replace(/-/g, '');
+  const qrImg = await generateQRCode(verifyUrl);
 
   const doc = new jsPDF('p','mm','a4');
-  const pw=210, m=25, cw=pw-m*2;
+  const pw = 210, m = 25, cw = pw - m * 2;
+  const fs = 12; // base font size for body
+  const lh = 7; // line height for body text
 
-  // Add logo to header (left side only, bigger)
+  // ---- HEADER ----
   try {
-    doc.addImage(LOGO_B64,'JPEG',m,14,24,24);
+    // Logo lebih besar & proporsional (pertahankan rasio asli, tinggi target ~31mm).
+    const ld = await getImgDims(LOGO_B64);
+    const logoH = 31;
+    const logoW = Math.min(38, logoH * ((ld.w / ld.h) || 1));
+    doc.addImage(LOGO_B64, 'JPEG', m, 9, logoW, logoH);
   } catch(e) { console.log('Logo error:', e); }
 
-  doc.setFont('helvetica','bold'); doc.setFontSize(14);
-  doc.text('PT. HIRZAN PRIMA CIPTA',pw/2+8,23,{align:'center'});
-  doc.setFont('helvetica','italic'); doc.setFontSize(10);
-  doc.text('Perusahaan Teknologi dan Pengembangan Software',pw/2+8,30,{align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(8);
-  doc.text('Alamat: Jl. Rusni S. Kabli, Kelurahan Hutuo, Kecamatan Limboto, Kabupaten Gorontalo',pw/2+8,36,{align:'center'});
-  doc.text('Telp. 085341313138',pw/2+8,41,{align:'center'});
+  const headerCx = pw / 2 + 8;
+  doc.setFont('times','bold'); doc.setFontSize(15);
+  doc.text('PT. HIRZAN PRIMA CIPTA', headerCx, 22, {align:'center'});
+  doc.setFont('times','italic'); doc.setFontSize(11);
+  doc.text('Perusahaan Teknologi dan Pengembangan Software', headerCx, 28, {align:'center'});
+  doc.setFont('times','normal'); doc.setFontSize(9);
+  doc.text('Alamat: Jl. Rusni S. Kabli, Kelurahan Hutuo, Kecamatan Limboto, Kabupaten Gorontalo', headerCx, 34, {align:'center'});
+  doc.text('Telp. 085341313138', headerCx, 39, {align:'center'});
 
-  doc.setLineWidth(0.8); doc.line(m,45,pw-m,45);
-  doc.setLineWidth(0.3); doc.line(m,46.5,pw-m,46.5);
+  // Double line
+  doc.setLineWidth(1.0); doc.line(m, 43, pw - m, 43);
+  doc.setLineWidth(0.3); doc.line(m, 44.8, pw - m, 44.8);
 
-  let y=55;
-  doc.setFont('helvetica','bold'); doc.setFontSize(12);
-  doc.text('SURAT KETERANGAN BEBAS PLAGIARISME',pw/2,y,{align:'center'});
-  y+=6; doc.setFontSize(10);
-  doc.text('Nomor: '+d.nomorSurat,pw/2,y,{align:'center'});
+  // ---- TITLE ----
+  let y = 54;
+  doc.setFont('times','bold'); doc.setFontSize(13);
+  doc.text('SURAT KETERANGAN BEBAS PLAGIARISME', pw / 2, y, {align:'center'});
+  y += 6;
+  doc.setFont('times','bold'); doc.setFontSize(fs);
+  doc.text('Nomor: ' + d.nomorSurat, pw / 2, y, {align:'center'});
 
-  y+=10; doc.setFont('helvetica','bold'); doc.setFontSize(10);
-  doc.text('Yang bertanda tangan di bawah ini:',m,y);
+  // ---- BODY: "Yang bertanda tangan..." ----
+  y += 12;
+  doc.setFont('times','normal'); doc.setFontSize(fs);
+  doc.text('Yang bertanda tangan di bawah ini:', m, y);
 
-  y+=8; doc.setFont('helvetica','normal');
-  const lx=m, vx=m+40;
-  doc.text('Nama',lx,y); doc.text(': Hasan Ayuba, M.Pd',vx,y);
-  y+=6; doc.text('Jabatan',lx,y); doc.text(': Direktur PT. HIRZAN PRIMA CIPTA',vx,y);
-  y+=9; doc.text('Dengan ini menerangkan bahwa:',m,y);
+  // Label-value helper
+  const labelX = m;
+  const colonX = m + 38;
+  const valueX = m + 42;
+  const maxValW = cw - 42;
 
-  y+=8; doc.text('Nama',lx,y); doc.text(': '+d.nama,vx,y);
-  y+=6; doc.text('Status',lx,y); doc.text(': '+d.status,vx,y);
-  y+=6; doc.text('Instansi',lx,y); doc.text(': '+d.instansi,vx,y);
-  y+=6; doc.text('Jurusan',lx,y); doc.text(': '+d.jurusan,vx,y);
-  y+=6; doc.text('Judul Penelitian',lx,y);
+  function drawField(label, value) {
+    doc.setFont('times','normal'); doc.setFontSize(fs);
+    doc.text(label, labelX, y);
+    doc.text(':', colonX, y);
+    const lines = doc.splitTextToSize(value, maxValW);
+    doc.text(lines, valueX, y);
+    y += lines.length * lh;
+  }
 
-  const jl=doc.splitTextToSize(': '+d.judul,cw-40); doc.text(jl,vx,y); y+=jl.length*5.5;
+  // Penandatangan
+  y += 8;
+  drawField('Nama', 'Hasan Ayuba, M.Pd');
+  drawField('Jabatan', 'Direktur PT. HIRZAN PRIMA CIPTA');
 
-  y+=8;
-  const para='Penelitian di atas sudah melewati proses pengecekan plagiasi dan dinyatakan sudah memenuhi syarat batas maksimal plagiasi. Hasil plagiasi terbaca '+d.similarity+' similarity index pada naskah penelitian.';
-  const pl=doc.splitTextToSize(para,cw); doc.text(pl,m,y); y+=pl.length*5.5;
-  y+=6; doc.text('Demikian Surat Keterangan ini dibuat agar dapat digunakan seperlunya.',m,y);
+  y += 3;
+  doc.setFont('times','normal'); doc.setFontSize(fs);
+  doc.text('Dengan ini menerangkan bahwa:', m, y);
 
-  // Format tanggal: "Gorontalo, 03 Maret 2026"
+  // Data pemesan
+  y += 8;
+  drawField('Nama', d.nama);
+  drawField('Status', d.status);
+  drawField('Instansi', d.instansi);
+  drawField('Jurusan', d.jurusan);
+
+  // Judul Penelitian - label on its own, value may wrap
+  doc.setFont('times','normal'); doc.setFontSize(fs);
+  doc.text('Judul Penelitian', labelX, y);
+  doc.text(':', colonX, y);
+  const judulLines = doc.splitTextToSize(d.judul, maxValW);
+  doc.text(judulLines, valueX, y);
+  y += judulLines.length * lh;
+
+  // ---- PARAGRAPH with bold similarity ----
+  y += 6;
+  doc.setFont('times','normal'); doc.setFontSize(fs);
+
+  const paraPart1 = 'Penelitian di atas sudah melewati proses pengecekan plagiasi dan dinyatakan sudah memenuhi syarat batas maksimal plagiasi. Hasil plagiasi terbaca ';
+  const paraBold = d.similarity + '% similarity index pada naskah penelitian.';
+
+  // We need to render this as a flowing paragraph with mixed bold.
+  // Strategy: render the full text first to get line breaks, then re-render with bold on the right words.
+  const fullPara = paraPart1 + paraBold;
+  const paraLines = doc.splitTextToSize(fullPara, cw);
+
+  // Render each line, detecting where the bold part starts
+  const boldStart = paraPart1.length;
+  let charIdx = 0;
+  for (let i = 0; i < paraLines.length; i++) {
+    const line = paraLines[i];
+    const lineStart = charIdx;
+    const lineEnd = charIdx + line.length;
+
+    if (lineEnd <= boldStart) {
+      // Entire line is normal
+      doc.setFont('times','normal');
+      doc.text(line, m, y);
+    } else if (lineStart >= boldStart) {
+      // Entire line is bold
+      doc.setFont('times','bold');
+      doc.text(line, m, y);
+    } else {
+      // Mixed line: part normal, part bold
+      const normalPart = line.substring(0, boldStart - lineStart);
+      const boldPart = line.substring(boldStart - lineStart);
+
+      doc.setFont('times','normal');
+      doc.text(normalPart, m, y);
+      const normalW = doc.getTextWidth(normalPart);
+      doc.setFont('times','bold');
+      doc.text(boldPart, m + normalW, y);
+    }
+    y += lh;
+    charIdx += line.length;
+    // Account for space that splitTextToSize may strip between lines
+    if (charIdx < fullPara.length && fullPara[charIdx] === ' ') charIdx++;
+  }
+
+  // "Demikian..." - italic style like formal letters
+  y += 4;
+  doc.setFont('times','italic'); doc.setFontSize(fs);
+  doc.text('Demikian Surat Keterangan ini dibuat agar dapat digunakan seperlunya.', m, y);
+
+  // ---- SIGNATURE BLOCK (right-aligned) ----
+  // Format tanggal
   const tglParts = d.tanggal.split(' ');
   let tglFormatted = d.tanggal;
   if (tglParts.length >= 3) {
@@ -1764,42 +1937,52 @@ async function generateFromInvoice() {
     tglFormatted = day + ' ' + tglParts.slice(1).join(' ');
   }
 
-  // Signature area
-  y+=14; const sx=pw-m-60;
-  doc.text('Gorontalo, '+tglFormatted,sx,y);
-  y+=6; doc.setFont('helvetica','bold'); doc.text('Direktur',sx,y);
+  const sigX = pw - m - 65;
+  y += 14;
+  doc.setFont('times','normal'); doc.setFontSize(fs);
+  doc.text('Gorontalo, ' + tglFormatted, sigX, y);
+  y += 7;
+  doc.setFont('times','bold'); doc.setFontSize(fs);
+  doc.text('Direktur', sigX, y);
 
-  // QR Code as electronic signature (centered in signature area)
-  if(qrImg){
-    const qrSig=30;
-    const qrSigX=sx+10;
-    y+=4;
-    doc.addImage(qrImg,'PNG',qrSigX,y,qrSig,qrSig);
-    y+=qrSig+3;
+  // QR Code (compact style)
+  if (qrImg) {
+    const qrSig = 22;
+    const qrSigX = sigX + 10;
+    y += 3;
+    doc.addImage(qrImg, 'PNG', qrSigX, y, qrSig, qrSig);
+    y += qrSig + 4;
   } else {
-    y+=20;
+    y += 22;
   }
 
-  // "Ditandatangani secara elektronik" text
-  doc.setFont('helvetica','normal'); doc.setFontSize(7);
-  doc.setTextColor(100,100,100);
-  doc.text('Ditandatangani secara elektronik',sx,y);
-  doc.setTextColor(0,0,0);
-  y+=6;
+  // "Ditandatangani secara elektronik"
+  doc.setFont('times','normal'); doc.setFontSize(7);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Ditandatangani secara elektronik', sigX, y);
+  doc.setTextColor(0, 0, 0);
+  y += 6;
 
-  // Nama penandatangan
-  doc.setFont('helvetica','bold'); doc.setFontSize(10);
-  doc.text('Hasan Ayuba, M.Pd.',sx,y);
+  // Nama penandatangan - bold underline
+  doc.setFont('times','bold'); doc.setFontSize(fs);
+  doc.text('Hasan Ayuba, M.Pd.', sigX, y);
+  // Underline
+  const nameW = doc.getTextWidth('Hasan Ayuba, M.Pd.');
+  doc.setLineWidth(0.4);
+  doc.line(sigX, y + 1, sigX + nameW, y + 1);
 
-  // Footer
-  doc.setLineWidth(0.3); doc.line(m,280,pw-m,280);
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.text('PT. HIRZAN PRIMA CIPTA',m,284);
-  doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(120,120,120);
-  doc.text('Dokumen ini ditandatangani secara elektronik dan sah tanpa memerlukan tanda tangan basah.',m,288);
-  doc.setFontSize(5.5); doc.text('Invoice: '+d.invoice,m,291);
-  doc.setTextColor(0,0,0);
+  // ---- FOOTER ----
+  doc.setLineWidth(0.3); doc.line(m, 280, pw - m, 280);
+  doc.setFont('times','bold'); doc.setFontSize(7);
+  doc.text('PT. HIRZAN PRIMA CIPTA', m, 284);
+  doc.setFont('times','normal'); doc.setFontSize(6);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Dokumen ini ditandatangani secara elektronik dan sah tanpa tanda tangan basah sesuai UU No. 11/2008 jo. UU No. 19/2016 (ITE) dan PP No. 71/2019.', m, 288);
+  doc.setFontSize(5.5);
+  doc.text('Invoice: ' + d.invoice + '   |   Kode Keaslian: ' + authCode + '   |   Pindai QR untuk memverifikasi keaslian dokumen secara daring.', m, 291);
+  doc.setTextColor(0, 0, 0);
 
-  doc.save('Surat_Keterangan_'+d.nama.replace(/\s+/g,'_')+'.pdf');
+  doc.save('Surat_Keterangan_' + d.nama.replace(/\s+/g, '_') + '.pdf');
   const dlResult = await markDownloaded(d.invoice);
   btn.classList.remove('btn-loading');
 
