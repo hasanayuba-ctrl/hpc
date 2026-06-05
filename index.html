@@ -1683,8 +1683,16 @@ function vvResultHtml(kind, title, desc, d){
       <h2 style="margin:0;color:#0F172A;font-size:19px;">${title}</h2>
       <p style="margin:8px 0 0;color:#475569;font-size:14px;line-height:1.6;">${desc}</p>
     </div>
-    ${rows ? `<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px;">${rows}</div>` : ''}
+    ${rows ? `<div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:12px;color:#854D0E;font-size:12.5px;line-height:1.6;">&#9888;&#65039; <b>Bandingkan dengan surat Anda.</b> Data di bawah ini adalah catatan <b>RESMI</b> dari PT. Hirzan Prima Cipta. Jika <b>ada satu saja</b> yang berbeda dengan yang tertera pada surat, berarti surat tersebut <b>telah diubah / tidak asli</b>.</div>
+    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px;">${rows}</div>` : ''}
     <p style="text-align:center;color:#94A3B8;font-size:11px;margin-top:18px;">Verifikasi resmi PT. Hirzan Prima Cipta &middot; <a href="${location.pathname}" style="color:#2563EB;text-decoration:none;">Kembali ke Beranda</a></p>`;
+}
+
+async function vvFetch(action, invoice){
+  try {
+    const r = await fetch(API_URL + '?action=' + action + '&invoice=' + encodeURIComponent(invoice));
+    return await r.json();
+  } catch (e) { return null; }
 }
 
 async function runPublicVerify(invoice, k){
@@ -1693,29 +1701,45 @@ async function runPublicVerify(invoice, k){
       <div style="text-align:center;color:#475569;font-family:'Inter',system-ui,sans-serif;">Memverifikasi dokumen&hellip;</div>
     </div></div>`;
   const card = document.getElementById('vvCard');
-  try {
-    const resp = await fetch(API_URL + '?action=verify&invoice=' + encodeURIComponent(invoice));
-    const res = await resp.json();
-    if (!res || res.status !== 'success') {
+
+  // 1) Utamakan action=check (verifikasi murni, tanpa batas unduh) bila sudah tersedia di backend.
+  let res = await vvFetch('check', invoice);
+  // 2) Fallback ke action=verify bila check belum ada / belum sukses.
+  if (!res || res.status !== 'success') {
+    const v = await vvFetch('verify', invoice);
+    if (v && v.status === 'success') {
+      res = v;
+    } else {
+      const msg = (v && v.message) || (res && res.message) || '';
+      // Error "batas unduh" = invoice REAL & terdaftar (invoice palsu akan "tidak ditemukan").
+      if (/diunduh|maksimal|batas|limit|download/i.test(msg)) {
+        card.innerHTML = vvResultHtml('valid', 'Dokumen Terdaftar Resmi',
+          'Nomor invoice <b>' + vvEsc(invoice) + '</b> TERDAFTAR resmi pada sistem PT. Hirzan Prima Cipta. (Tambahkan endpoint <code>action=check</code> pada backend agar rincian &amp; kode keaslian tampil otomatis di sini.)', null);
+        return;
+      }
+      if (!v && !res) {
+        card.innerHTML = vvResultHtml('invalid', 'Gagal Memverifikasi',
+          'Tidak dapat terhubung ke server verifikasi. Periksa koneksi internet lalu coba lagi.', null);
+        return;
+      }
       card.innerHTML = vvResultHtml('invalid', 'Dokumen Tidak Ditemukan',
         'Nomor invoice <b>' + vvEsc(invoice) + '</b> tidak terdaftar pada sistem PT. Hirzan Prima Cipta. Dokumen kemungkinan tidak resmi.', null);
       return;
     }
-    const d = res.data;
-    const expected = (await docAuthCode(d)).replace(/-/g,'');
-    const provided = (k || '').toUpperCase().replace(/-/g,'');
-    const match = provided.length > 0 && expected === provided;
-    card.innerHTML = vvResultHtml(
-      match ? 'valid' : 'warn',
-      match ? 'Dokumen ASLI &amp; Terverifikasi' : 'Terdaftar, namun Kode Keaslian Tidak Cocok',
-      match
-        ? 'Surat keterangan ini benar diterbitkan oleh PT. Hirzan Prima Cipta dan seluruh datanya cocok dengan catatan resmi.'
-        : 'Nomor invoice terdaftar, tetapi kode keaslian pada dokumen tidak sesuai dengan catatan resmi. Dokumen mungkin telah diubah. Mohon konfirmasi ke penerbit.',
-      d);
-  } catch (e) {
-    card.innerHTML = vvResultHtml('invalid', 'Gagal Memverifikasi',
-      'Tidak dapat terhubung ke server verifikasi. Periksa koneksi internet lalu coba lagi.', null);
   }
+
+  // Sukses dengan data → cocokkan kode keaslian.
+  const d = res.data;
+  const expected = (await docAuthCode(d)).replace(/-/g, '');
+  const provided = (k || '').toUpperCase().replace(/-/g, '');
+  const match = provided.length > 0 && expected === provided;
+  card.innerHTML = vvResultHtml(
+    match ? 'valid' : 'warn',
+    match ? 'Dokumen ASLI &amp; Terverifikasi' : 'Terdaftar, namun Kode Keaslian Tidak Cocok',
+    match
+      ? 'Surat keterangan ini benar diterbitkan oleh PT. Hirzan Prima Cipta dan seluruh datanya cocok dengan catatan resmi.'
+      : 'Nomor invoice terdaftar, tetapi kode keaslian pada dokumen tidak sesuai dengan catatan resmi. Dokumen mungkin telah diubah. Mohon konfirmasi ke penerbit.',
+    d);
 }
 
 // Bila QR dipindai (URL memuat ?verify=INVOICE&k=KODE), tampilkan hasil verifikasi.
